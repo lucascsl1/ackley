@@ -7,7 +7,7 @@ def createPopulation(amount):
     for i in range(0, amount):
         aux = []
         for e in range(0, 30):
-            aux = aux + [random.randint(-15, 15)]
+            aux = aux + [random.uniform(-15.0, 15.0)]
         population = population + [aux]
     return population
 
@@ -30,7 +30,7 @@ def cutAndCrossfill(parent1, parent2, cut):
 def xRandom(x, population):
     chosen = []
     for i in range(0, x):
-        chosen = chosen + [random.randint(0, len(population))]
+        chosen = chosen + [random.randint(0, (len(population) - 1))]
     return chosen
 
 def xTournament(population, chosen, x):
@@ -46,7 +46,7 @@ def xWost(population, chosen, x):
     worst = chosen[:x]
     for i in range(x, len(chosen)):
         for e in range(0, x):
-            if individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[i] - 1]) > individualFitness(20.0, 0.2, (2 * math.pi), population[worst[e] - 1]):
+            if individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[i]]) > individualFitness(20.0, 0.2, (2 * math.pi), population[worst[e]]):
                 worst[e] = chosen[i]
                 break
     return worst
@@ -67,7 +67,7 @@ def APFwithBestSubject(population):
 def mutation(subject, x):
     for i in range(0, x):
         aux = random.randint(0, 29)
-        subject[aux] = (subject[aux]) + (random.randint(-3, 3))
+        subject[aux] = (subject[aux]) + (random.uniform(-1.0, 1.0))
         if subject[aux] < -15:
             subject[aux] = -15
         elif subject[aux] > 15:
@@ -92,15 +92,15 @@ def test(iterations):
         z = bestI
         #average = average + [avgF]
         #best = best + [bestF]
-        #print ("Media: " + str(avgF) + ", Melhor Individuo: " + str(bestF) + ", " + str(population[bestI]))
+        print ("Media: " + str(avgF) + ", Melhor Individuo: " + str(bestF) + ", " + str(population[bestI]))
         chosen = xRandom(10, population)
         parents = xTournament(population, chosen, 5)
 
         childs = []
-        childs = childs + [cutAndCrossfill(population[parents[0] - 1], population[parents[3] - 1], random.randint(10, 20))]
-        childs = childs + [cutAndCrossfill(population[parents[3] - 1], population[parents[0] - 1], random.randint(10, 20))]
-        childs = childs + [cutAndCrossfill(population[parents[1] - 1], population[parents[2] - 1], random.randint(10, 20))]
-        childs = childs + [cutAndCrossfill(population[parents[2] - 1], population[parents[1] - 1], random.randint(10, 20))]
+        childs = childs + [cutAndCrossfill(population[parents[0] - 1], population[parents[3] - 1], random.randint(8, 12))]
+        childs = childs + [cutAndCrossfill(population[parents[3] - 1], population[parents[0] - 1], random.randint(8, 12))]
+        childs = childs + [cutAndCrossfill(population[parents[1] - 1], population[parents[2] - 1], random.randint(8, 12))]
+        childs = childs + [cutAndCrossfill(population[parents[2] - 1], population[parents[1] - 1], random.randint(8, 12))]
 
         old = xWost(population, chosen, 4)
 
@@ -108,7 +108,7 @@ def test(iterations):
         mutation(population[parents[4] - 1], random.randint(3, 5))
 
 
-    print ("Media: " + str(x) + ", Melhor Individuo: " + str(y) + ", " + str(population[z]))
+    #print ("Media: " + str(x) + ", Melhor Individuo: " + str(y) + ", " + str(population[z]))
     #xAxis = range(0, len(average))
     #plt.plot(xAxis, average, color='blue')
     #plt.plot(xAxis, best, color='red')
@@ -116,8 +116,7 @@ def test(iterations):
     #plt.ylabel('Fitness')
     #plt.show()
 
-for i in range(0,200):
-    test(2000)
+test(100000)
 
 
 
