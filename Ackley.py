@@ -27,6 +27,12 @@ def cutAndCrossfill(parent1, parent2, cut):
     child = parent1[:cut] + parent2[cut:]
     return child
 
+def meanValueGeneration(parent1, parent2):
+    child = parent1[:]
+    for i in range(0, len(parent1)):
+        child[i] = (child[i] + parent2[i])/2
+    return child
+
 def xRandom(x, population):
     chosen = []
     for i in range(0, x):
@@ -42,7 +48,7 @@ def xTournament(population, chosen, x):
                 break
     return best
 
-def xWost(population, chosen, x):
+def xWorst(population, chosen, x):
     worst = chosen[:x]
     for i in range(x, len(chosen)):
         for e in range(0, x):
@@ -77,7 +83,7 @@ def replace(population, new, old):
     for i in range(0, len(new)):
         population[old[i] - 1] = new[i]
 
-def test(iterations):
+def test1(iterations):
     population = createPopulation(100)
     average = []
     best = []
@@ -102,7 +108,7 @@ def test(iterations):
         childs = childs + [cutAndCrossfill(population[parents[1] - 1], population[parents[2] - 1], random.randint(8, 12))]
         childs = childs + [cutAndCrossfill(population[parents[2] - 1], population[parents[1] - 1], random.randint(8, 12))]
 
-        old = xWost(population, chosen, 4)
+        old = xWorst(population, chosen, 4)
 
         replace(population, childs, old)
         mutation(population[parents[4] - 1], random.randint(3, 5))
@@ -116,7 +122,54 @@ def test(iterations):
     #plt.ylabel('Fitness')
     #plt.show()
 
-test(100000)
+def test2(iterations):
+    population = createPopulation(100)
+    average = []
+    best = []
+    x = 0
+    y = 0
+    z = 0
+
+    for i in range(0, iterations):
+        avgF, bestF, bestI = APFwithBestSubject(population)
+        x = avgF
+        y = bestF
+        z = bestI
+        #average = average + [avgF]
+        #best = best + [bestF]
+        print ("Media: " + str(avgF) + ", Melhor Individuo: " + str(bestF) + ", " + str(population[bestI]))
+        chosen = xRandom(15, population)
+        parents = xTournament(population, chosen, 4)
+
+        childs = []
+        childs = childs + [meanValueGeneration(population[parents[3] - 1], population[parents[0] - 1])]
+        childs = childs + [meanValueGeneration(population[parents[2] - 1], population[parents[1] - 1])]
+        childs = childs + [meanValueGeneration(population[parents[3] - 1], population[parents[2] - 1])]
+        childs = childs + [meanValueGeneration(population[parents[2] - 1], population[parents[0] - 1])]
+        childs = childs + [population[parents[3] - 1]]
+        childs = childs + [population[parents[2] - 1]]
+        childs = childs + [population[parents[1] - 1]]
+        childs = childs + [population[parents[0] - 1]]
+
+        mutation(childs[4], random.randint(3, 6))
+        mutation(childs[5], random.randint(3, 6))
+        mutation(childs[6], random.randint(3, 6))
+        mutation(childs[7], random.randint(3, 6))
+        old = xWorst(population, chosen, 8)
+
+        replace(population, childs, old)
+
+
+
+    #print ("Media: " + str(x) + ", Melhor Individuo: " + str(y) + ", " + str(population[z]))
+    #xAxis = range(0, len(average))
+    #plt.plot(xAxis, average, color='blue')
+    #plt.plot(xAxis, best, color='red')
+    #plt.xlabel('Iteracoes')
+    #plt.ylabel('Fitness')
+    #plt.show()
+
+test2(100000)
 
 
 
