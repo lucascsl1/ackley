@@ -35,34 +35,55 @@ def meanValueGeneration(parent1, parent2):
 
 def xRandom(x, population):
     chosen = []
-    for i in range(0, x):
-        chosen = chosen + [random.randint(0, (len(population) - 1))]
+    for i in range(x):
+        y = random.randint(0, (len(population) - 1))
+        if y not in chosen:
+            chosen = chosen + [y]
     return chosen
 
 def xTournament(population, chosen, x):
-    best = chosen[:x]
-    for i in range(x, len(chosen)):
-        for e in range(0, x):
-            if individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[i] - 1]) < individualFitness(20.0, 0.2, (2 * math.pi), population[best[e] - 1]):
-                best[e] = chosen[i]
-                break
+    best = []
+    aux = 999999
+    for a in range (0, x):
+        best = best + [None]
+    for i in range(0, x):
+        for e in range(1, len(chosen) - 1):
+            if e == 1:
+                if individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[1]]) < individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[0]]):
+                    aux = 1
+                else:
+                    aux = 0
+            elif individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[e]]) < individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[aux]]):
+                aux = e
+        best[i] = chosen[aux]
+        chosen = chosen[:aux] + chosen[aux + 1:]
     return best
 
 def xWorst(population, chosen, x):
-    worst = chosen[:x]
-    for i in range(x, len(chosen)):
-        for e in range(0, x):
-            if individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[i]]) > individualFitness(20.0, 0.2, (2 * math.pi), population[worst[e]]):
-                worst[e] = chosen[i]
-                break
+    worst = []
+    aux = 999999
+    for a in range(0, x):
+        worst = worst + [None]
+    for i in range(0, x):
+        for e in range(1, len(chosen) - 1):
+            if e == 1:
+                if individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[1]]) > individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[0]]):
+                    aux = 1
+                else:
+                    aux = 0
+            elif individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[e]]) > individualFitness(20.0, 0.2, (2 * math.pi), population[chosen[aux]]):
+                aux = e
+        worst[i] = chosen[aux]
+        chosen = chosen[:aux] + chosen[aux + 1:]
     return worst
 
 def APFwithBestSubject(population):
     fitness = 0.0
-    bestFitness = 9999999.9
     bestIndex = 0
     for i in range(0, len(population)):
         x = individualFitness(20.0, 0.2, (2 * math.pi), population[i])
+        if i == 0:
+            bestFitness = x
         if x < bestFitness:
             bestFitness = x
             bestIndex = i
@@ -81,7 +102,7 @@ def mutation(subject, x):
 
 def replace(population, new, old):
     for i in range(0, len(new)):
-        population[old[i] - 1] = new[i]
+        population[old[i]] = new[i]
 
 def test1(iterations):
     population = createPopulation(100)
@@ -138,24 +159,25 @@ def test2(iterations):
         #average = average + [avgF]
         #best = best + [bestF]
         print ("Media: " + str(avgF) + ", Melhor Individuo: " + str(bestF) + ", " + str(population[bestI]))
-        chosen = xRandom(15, population)
+        chosen = xRandom(18, population)
         parents = xTournament(population, chosen, 4)
+        old = xWorst(population, chosen, 8)
 
         childs = []
-        childs = childs + [meanValueGeneration(population[parents[3] - 1], population[parents[0] - 1])]
-        childs = childs + [meanValueGeneration(population[parents[2] - 1], population[parents[1] - 1])]
-        childs = childs + [meanValueGeneration(population[parents[3] - 1], population[parents[2] - 1])]
-        childs = childs + [meanValueGeneration(population[parents[2] - 1], population[parents[0] - 1])]
-        childs = childs + [population[parents[3] - 1]]
-        childs = childs + [population[parents[2] - 1]]
-        childs = childs + [population[parents[1] - 1]]
-        childs = childs + [population[parents[0] - 1]]
+        childs = childs + [meanValueGeneration(population[parents[3]], population[parents[0]])]
+        childs = childs + [meanValueGeneration(population[parents[2]], population[parents[1]])]
+        childs = childs + [meanValueGeneration(population[parents[3]], population[parents[2]])]
+        childs = childs + [meanValueGeneration(population[parents[2]], population[parents[0]])]
+        childs = childs + [population[parents[3]]]
+        childs = childs + [population[parents[2]]]
+        childs = childs + [population[parents[1]]]
+        childs = childs + [population[parents[0]]]
 
         mutation(childs[4], random.randint(3, 6))
         mutation(childs[5], random.randint(3, 6))
         mutation(childs[6], random.randint(3, 6))
         mutation(childs[7], random.randint(3, 6))
-        old = xWorst(population, chosen, 8)
+
 
         replace(population, childs, old)
 
@@ -170,12 +192,6 @@ def test2(iterations):
     #plt.show()
 
 test2(100000)
-
-
-
-#x = []
-#for i in range(0, 30):
-#    x = x + [0]
 
 #z = individualFitness(20.0, 0.2, (2 * math.pi), x)
 #print z
