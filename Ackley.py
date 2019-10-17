@@ -92,13 +92,32 @@ def APFwithBestSubject(population):
     return fitness,bestFitness,bestIndex
 
 def mutation(subject, x):
-    for i in range(0, x):
-        aux = random.randint(0, 29)
-        subject[aux] = (subject[aux]) + (round(random.uniform(-1.0, 1.0), 11))
-        if subject[aux] < -15:
-            subject[aux] = -15
-        elif subject[aux] > 15:
-            subject[aux] = 15
+    mutated = subject[:]
+    mutate = []
+    for e in range(x):
+        y = random.randint(0, (len(subject) - 1))
+        if y not in mutate:
+            mutate = mutate + [y]
+    for i in range(0, len(mutate)):
+        mutated[mutate[i]] = (mutated[mutate[i]]) + (round(random.uniform(-1.0, 1.0), 11))
+        if mutated[mutate[i]] < -15:
+            mutated[mutate[i]] = -15
+        elif mutated[mutate[i]] > 15:
+            mutated[mutate[i]] = 15
+    return mutated
+
+def mutationSwap(subject, x):
+    mutate = []
+    for e in range(x):
+        y = random.randint(0, (len(subject) - 1))
+        if y not in mutate:
+            mutate = mutate + [y]
+    for i in range(0, len(mutate)):
+        subject[mutate[i]] = (subject[mutate[i]]) + (round(random.uniform(-1.0, 1.0), 11))
+        if subject[mutate[i]] < -15:
+            subject[mutate[i]] = -15
+        elif subject[mutate[i]] > 15:
+            subject[mutate[i]] = 15
 
 def replace(population, new, old):
     for i in range(0, len(new)):
@@ -150,12 +169,14 @@ def test2(iterations):
     x = 0
     y = 0
     z = 0
+    previousbest = 0
 
     for i in range(0, iterations):
         avgF, bestF, bestI = APFwithBestSubject(population)
         x = avgF
         y = bestF
         z = bestI
+
         #average = average + [avgF]
         #best = best + [bestF]
         print ("Media: " + str(avgF) + ", Melhor Individuo: " + str(bestF) + ", " + str(population[bestI]))
@@ -168,20 +189,12 @@ def test2(iterations):
         childs = childs + [meanValueGeneration(population[parents[2]], population[parents[1]])]
         childs = childs + [meanValueGeneration(population[parents[3]], population[parents[2]])]
         childs = childs + [meanValueGeneration(population[parents[2]], population[parents[0]])]
-        childs = childs + [population[parents[3]]]
-        childs = childs + [population[parents[2]]]
-        childs = childs + [population[parents[1]]]
-        childs = childs + [population[parents[0]]]
-
-        mutation(childs[4], random.randint(3, 6))
-        mutation(childs[5], random.randint(3, 6))
-        mutation(childs[6], random.randint(3, 6))
-        mutation(childs[7], random.randint(3, 6))
-
+        childs = childs + [mutation(population[parents[3]], random.randint(3, 5))]
+        childs = childs + [mutation(population[parents[2]], random.randint(3, 5))]
+        childs = childs + [mutation(population[parents[1]], random.randint(3, 5))]
+        childs = childs + [mutation(population[parents[0]], random.randint(3, 5))]
 
         replace(population, childs, old)
-
-
 
     #print ("Media: " + str(x) + ", Melhor Individuo: " + str(y) + ", " + str(population[z]))
     #xAxis = range(0, len(average))
