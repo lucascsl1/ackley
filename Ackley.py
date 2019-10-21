@@ -106,6 +106,36 @@ def mutation(subject, x):
             mutated[mutate[i]] = 15
     return mutated
 
+def mutation2(subject, x):
+    mutated = subject[:]
+    mutate = []
+    for e in range(x):
+        y = random.randint(0, (len(subject) - 1))
+        if y not in mutate:
+            mutate = mutate + [y]
+    for i in range(0, len(mutate)):
+        mutated[mutate[i]] = (mutated[mutate[i]]) + (round(random.uniform(-0.5, 0.5), 11))
+        if mutated[mutate[i]] < -15:
+            mutated[mutate[i]] = -15
+        elif mutated[mutate[i]] > 15:
+            mutated[mutate[i]] = 15
+    return mutated
+
+def mutation3(subject, x):
+    mutated = subject[:]
+    mutate = []
+    for e in range(x):
+        y = random.randint(0, (len(subject) - 1))
+        if y not in mutate:
+            mutate = mutate + [y]
+    for i in range(0, len(mutate)):
+        mutated[mutate[i]] = (mutated[mutate[i]]) + (round(random.uniform(-0.0005, 0.0005), 11))
+        if mutated[mutate[i]] < -15:
+            mutated[mutate[i]] = -15
+        elif mutated[mutate[i]] > 15:
+            mutated[mutate[i]] = 15
+    return mutated
+
 def mutationSwap(subject, x):
     mutate = []
     for e in range(x):
@@ -136,31 +166,34 @@ def test1(iterations):
         x = avgF
         y = bestF
         z = bestI
-        #average = average + [avgF]
-        #best = best + [bestF]
+        average = average + [avgF]
+        best = best + [bestF]
+
         print ("Media: " + str(avgF) + ", Melhor Individuo: " + str(bestF) + ", " + str(population[bestI]))
-        chosen = xRandom(10, population)
-        parents = xTournament(population, chosen, 5)
+        chosen = xRandom(18, population)
+        parents = xTournament(population, chosen, 4)
+        old = xWorst(population, chosen, 8)
 
         childs = []
         childs = childs + [cutAndCrossfill(population[parents[0]], population[parents[3]], random.randint(8, 12))]
         childs = childs + [cutAndCrossfill(population[parents[3]], population[parents[0]], random.randint(8, 12))]
         childs = childs + [cutAndCrossfill(population[parents[1]], population[parents[2]], random.randint(8, 12))]
         childs = childs + [cutAndCrossfill(population[parents[2]], population[parents[1]], random.randint(8, 12))]
-
-        old = xWorst(population, chosen, 4)
+        childs = childs + [mutation(population[parents[3]], random.randint(3, 5))]
+        childs = childs + [mutation(population[parents[2]], random.randint(3, 5))]
+        childs = childs + [mutation(population[parents[1]], random.randint(3, 5))]
+        childs = childs + [mutation(population[parents[0]], random.randint(3, 5))]
 
         replace(population, childs, old)
-        mutation(population[parents[4]], random.randint(3, 5))
 
 
     #print ("Media: " + str(x) + ", Melhor Individuo: " + str(y) + ", " + str(population[z]))
-    #xAxis = range(0, len(average))
-    #plt.plot(xAxis, average, color='blue')
-    #plt.plot(xAxis, best, color='red')
-    #plt.xlabel('Iteracoes')
-    #plt.ylabel('Fitness')
-    #plt.show()
+    xAxis = range(0, len(average))
+    plt.plot(xAxis, average, color='blue')
+    plt.plot(xAxis, best, color='red')
+    plt.xlabel('Iteracoes')
+    plt.ylabel('Fitness')
+    plt.show()
 
 def test2(iterations):
     population = createPopulation(100)
@@ -177,8 +210,11 @@ def test2(iterations):
         y = bestF
         z = bestI
 
-        #average = average + [avgF]
-        #best = best + [bestF]
+        average = average + [avgF]
+        best = best + [bestF]
+        if bestF <= -1.71828182846:
+            print ("convergiu em:" + str(i))
+            break
         print ("Media: " + str(avgF) + ", Melhor Individuo: " + str(bestF) + ", " + str(population[bestI]))
         chosen = xRandom(18, population)
         parents = xTournament(population, chosen, 4)
@@ -189,20 +225,31 @@ def test2(iterations):
         childs = childs + [meanValueGeneration(population[parents[2]], population[parents[1]])]
         childs = childs + [meanValueGeneration(population[parents[3]], population[parents[2]])]
         childs = childs + [meanValueGeneration(population[parents[2]], population[parents[0]])]
-        childs = childs + [mutation(population[parents[3]], random.randint(3, 5))]
-        childs = childs + [mutation(population[parents[2]], random.randint(3, 5))]
-        childs = childs + [mutation(population[parents[1]], random.randint(3, 5))]
-        childs = childs + [mutation(population[parents[0]], random.randint(3, 5))]
+        if bestF > -1.2:
+            childs = childs + [mutation(population[parents[3]], random.randint(1, 5))]
+            childs = childs + [mutation(population[parents[2]], random.randint(1, 5))]
+            childs = childs + [mutation(population[parents[1]], random.randint(1, 5))]
+            childs = childs + [mutation(population[parents[0]], random.randint(1, 5))]
+        elif bestF > -1.7:
+            childs = childs + [mutation2(population[parents[3]], random.randint(1, 2))]
+            childs = childs + [mutation2(population[parents[2]], random.randint(1, 2))]
+            childs = childs + [mutation2(population[parents[1]], random.randint(1, 2))]
+            childs = childs + [mutation2(population[parents[0]], random.randint(1, 2))]
+        else:
+            childs = childs + [mutation3(population[parents[3]], 1)]
+            childs = childs + [mutation3(population[parents[2]], 1)]
+            childs = childs + [mutation3(population[parents[1]], 1)]
+            childs = childs + [mutation3(population[parents[0]], 1)]
 
         replace(population, childs, old)
 
-    #print ("Media: " + str(x) + ", Melhor Individuo: " + str(y) + ", " + str(population[z]))
-    #xAxis = range(0, len(average))
-    #plt.plot(xAxis, average, color='blue')
-    #plt.plot(xAxis, best, color='red')
-    #plt.xlabel('Iteracoes')
-    #plt.ylabel('Fitness')
-    #plt.show()
+    print ("Media: " + str(x) + ", Melhor Individuo: " + str(y) + ", " + str(population[z]))
+    xAxis = range(0, len(average))
+    plt.plot(xAxis, average, color='blue')
+    plt.plot(xAxis, best, color='red')
+    plt.xlabel('Iteracoes')
+    plt.ylabel('Fitness')
+    plt.show()
 
 test2(10000)
 
